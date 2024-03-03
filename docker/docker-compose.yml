@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  vjepa:
+    image: lumeny/vjepa:latest
+    volumes:
+      - ..:/repo
+    container_name: vjepa
+    command: /bin/bash
+    tty: true
+    user: "root:root"
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              # count: 1
+              capabilities: [gpu]
+              device_ids: ['0']
+    restart: unless-stopped
