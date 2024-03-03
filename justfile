@@ -1,4 +1,5 @@
-default: enter-jepa
+default: 
+  @just --list
 
 build-container tag="latest":
   docker build -f docker/Dockerfile -t lumeny/vjepa:{{tag}} .
@@ -11,3 +12,8 @@ enter-jepa:
 
 test-image:
   docker run -it --rm lumeny/vjepa:latest bash
+
+
+alias e := enter-jepa
+
+alias b := build-container
