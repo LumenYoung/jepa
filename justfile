@@ -7,6 +7,9 @@ build-container tag="latest":
 run-container:
   docker compose -f docker/docker-compose.yml up -d
 
+run-container-force:
+  docker compose -f docker/docker-compose.yml up -d --force-recreate
+
 enter-jepa:
   docker exec -it vjepa bash
 
@@ -17,3 +20,6 @@ test-image:
 alias e := enter-jepa
 
 alias b := build-container
+
+alias r := run-container
+alias rf := run-container-force
