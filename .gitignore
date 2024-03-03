@@ -3,3 +3,4 @@
 src/jepa.egg-info
 build/lib
 dist
+ckpts
