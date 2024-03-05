@@ -1,5 +1,5 @@
-nodes: 8
-tasks_per_node: 8
+nodes: 2
+tasks_per_node: 1
 tag: k400-16x8x3
 eval_name: video_classification_frozen
 resume_checkpoint: true

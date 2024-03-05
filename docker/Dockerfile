@@ -1,4 +1,5 @@
-FROM mambaorg/micromamba:jammy-cuda-12.1.1 as micromamba
+FROM mambaorg/micromamba:jammy-cuda-12.2.2 as micromamba
+# FROM mambaorg/micromamba:jammy-cuda-12.1.1 as micromamba
 
 FROM nvidia/cuda:12.3.2-runtime-ubuntu22.04
 
