@@ -46,6 +46,10 @@ from evals.video_classification_frozen.utils import (
     FrameAggregation,
 )
 
+import src.models.predictor as vit_pred
+
+from src.models.utils.multimask import PredictorMultiMaskWrapper
+
 TRAINING = False
 
 logging.basicConfig()
@@ -265,6 +269,7 @@ def main(args_eval, resume_preempt=False):
     # TRAIN LOOP
     for epoch in range(start_epoch, num_epochs):
         logger.info("Epoch %d" % (epoch + 1))
+        train_acc = 0.0
         if TRAINING:
             train_acc = run_one_epoch(
                 device=device,
@@ -298,11 +303,13 @@ def main(args_eval, resume_preempt=False):
             use_bfloat16=use_bfloat16,
         )
 
-        logger.info(
-            "[%5d] train: %.3f%% test: %.3f%%" % (epoch + 1, train_acc, val_acc)
-        )
+        if TRAINING:
+            logger.info(
+                "[%5d] train: %.3f%% test: %.3f%%" % (epoch + 1, train_acc, val_acc)
+            )
         if rank == 0:
             csv_logger.log(epoch + 1, train_acc, val_acc)
+
         save_checkpoint(epoch + 1)
 
 
@@ -457,6 +464,20 @@ def load_pretrained(encoder, pretrained, checkpoint_key="target_encoder"):
     )
     del checkpoint
     return encoder
+
+def load_predictor(predictor_name:str, pretrained: str, checkpoint_key="predictor"):
+
+    predictor = vit_pred.__dict__[predictor_name]()
+    predictor = PredictorMultiMaskWrapper(predictor)
+
+    pretrained_predictor_dict = torch.load(pretrained, map_location="cpu")[checkpoint_key]
+
+    predictor.load_state_dict(pretrained_predictor_dict)
+
+    return predictor
+
+    
+
 
 
 def make_dataloader(
