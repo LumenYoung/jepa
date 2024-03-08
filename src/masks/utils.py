@@ -20,4 +20,4 @@ def apply_masks(x, masks, concat=True):
     if not concat:
         return all_x
 
-    return torch.cat(all_x, dim=0)
+    return torch.cat(all_x, dim=0)  # yang: okey, 这里只是从 list 改到 tensor

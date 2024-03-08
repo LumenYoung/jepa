@@ -229,7 +229,7 @@ class VisionTransformerPredictor(nn.Module):
 
         # Fwd prop
         for blk in self.predictor_blocks:
-            x = blk(x, mask=masks)
+            x = blk(x, mask=masks)   # Rediculous, this mask has been not use by anything
         x = self.predictor_norm(x)
 
         # Return output corresponding to target tokens
