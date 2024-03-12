@@ -21,6 +21,7 @@ import logging
 import pprint
 
 import numpy as np
+from typing import List
 
 import torch
 import torch.multiprocessing as mp
@@ -50,9 +51,13 @@ import src.models.predictor as vit_pred
 
 from src.models.utils.multimask import PredictorMultiMaskWrapper
 
+from datetime import datetime
+
 TRAINING = False
 
-logging.basicConfig()
+now = datetime.now()
+
+logging.basicConfig(filename=f"logs/eval_{now.strftime('%m-%d-%H-%M')}.log")
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -312,6 +317,12 @@ def main(args_eval, resume_preempt=False):
 
         save_checkpoint(epoch + 1)
 
+    if not TRAINING:
+        logger.info("Finished pure evaluation, remove the latest checkpoint")
+
+        if os.path.exists(latest_path):
+            os.remove(latest_path)
+
 
 def run_one_epoch(
     device,
@@ -328,6 +339,16 @@ def run_one_epoch(
     num_temporal_views,
     attend_across_segments,
 ):
+
+    def save_torch_to_file(tensor: torch.Tensor, filename: str):
+        torch.save(tensor, filename)
+
+    def save_embeddings(dir: str, embeddings: List[torch.Tensor], epoch: int):
+        directory = os.path.join(dir, str(epoch))
+        os.makedirs(directory, exist_ok=True)
+        for i, e in enumerate(embeddings):
+            save_torch_to_file(e, os.path.join(directory, f"embedding_{i}.pt"))
+
     classifier.train(mode=training)
     criterion = torch.nn.CrossEntropyLoss()
     top1_meter = AverageMeter()
@@ -344,6 +365,14 @@ def run_one_epoch(
                 ]  # iterate over spatial views of clip
                 for di in data[0]  # iterate over temporal index of clip
             ]
+
+            logger.info(f"data type: {type(data)}")
+            logger.info(f"clips shape: {clips[0][0].shape}")
+            logger.info(f"clips length: {len(clips)}")
+            logger.info(f"clips[0] length: {len(clips[0])}")
+            logger.info(f"clips[0] type: {type(clips[0])}")
+            logger.info(f"clips[0][0] type: {type(clips[0][0])}")
+
             clip_indices = [d.to(device, non_blocking=True) for d in data[2]]
             labels = data[1].to(device)
             batch_size = len(labels)
@@ -351,6 +380,13 @@ def run_one_epoch(
             # Forward and prediction
             with torch.no_grad():
                 outputs = encoder(clips, clip_indices)
+
+                logger.info(f"outputs length: {len(outputs)}")
+                logger.info(f"outputs[0] type: {type(outputs[0])}")
+                logger.info(f"outputs[0] shape: {outputs[0].shape}")
+
+                save_embeddings("play/converging_vid2_embed", outputs, itr)
+
                 if not training:
                     if attend_across_segments:
                         outputs = [classifier(o) for o in outputs]
@@ -465,19 +501,19 @@ def load_pretrained(encoder, pretrained, checkpoint_key="target_encoder"):
     del checkpoint
     return encoder
 
-def load_predictor(predictor_name:str, pretrained: str, checkpoint_key="predictor"):
+
+def load_predictor(predictor_name: str, pretrained: str, checkpoint_key="predictor"):
 
     predictor = vit_pred.__dict__[predictor_name]()
     predictor = PredictorMultiMaskWrapper(predictor)
 
-    pretrained_predictor_dict = torch.load(pretrained, map_location="cpu")[checkpoint_key]
+    pretrained_predictor_dict = torch.load(pretrained, map_location="cpu")[
+        checkpoint_key
+    ]
 
     predictor.load_state_dict(pretrained_predictor_dict)
 
     return predictor
-
-    
-
 
 
 def make_dataloader(
