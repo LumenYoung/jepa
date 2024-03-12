@@ -5,3 +5,11 @@ build/lib
 dist
 ckpts
 data/tryout
+play/approaching_vid_embed/0
+play/cliport_vid_embed/0
+play/diverging_vid1_embed/0
+play/converging_vid1_embed/0
+play/converging_vid2_embed/0
+play/diverging_vid2_embed/0
+required_repos
+jepa.egg-info
