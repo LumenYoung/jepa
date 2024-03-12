@@ -1,6 +1,6 @@
 # FROM mambaorg/micromamba:jammy-cuda-12.1.1 as micromamba
 
-FROM nvidia/cuda:12.3.2-devel-ubuntu22.04
+FROM nvidia/cuda:12.2.2-devel-ubuntu20.04
 
 ENV TZ=Europe/Berlin
 
@@ -15,7 +15,7 @@ RUN /root/.local/bin/micromamba create -n jepa python=3.9 -y
 SHELL ["/root/.local/bin/micromamba", "run", "-n", "jepa", "/bin/bash", "-c"]
 
 RUN echo "export PATH=\$PATH:~/.local/bin" && \
-  micromamba shell init --shell bash 
+  ~/.local/bin/micromamba shell init --shell bash 
 
 RUN echo "micromamba activate jepa" >> /root/.bashrc
 
