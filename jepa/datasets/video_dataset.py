@@ -18,7 +18,7 @@ from decord import VideoReader, cpu
 
 import torch
 
-from src.datasets.utils.weighted_sampler import DistributedWeightedSampler
+from jepa.datasets.utils.weighted_sampler import DistributedWeightedSampler
 
 _GLOBAL_SEED = 0
 logger = getLogger()
@@ -52,7 +52,7 @@ def make_videodataset(
         frames_per_clip=frames_per_clip,
         frame_step=frame_step,
         num_clips=num_clips,
-        random_clip_sampling=random_clip_sampling,
+        random_clip_sampling=False,
         allow_clip_overlap=allow_clip_overlap,
         filter_short_videos=filter_short_videos,
         filter_long_videos=filter_long_videos,
@@ -82,7 +82,8 @@ def make_videodataset(
         drop_last=drop_last,
         pin_memory=pin_mem,
         num_workers=num_workers,
-        persistent_workers=num_workers > 0)
+        persistent_workers=num_workers > 0,
+        shuffle=False)
     logger.info('VideoDataset unsupervised data loader created')
 
     return dataset, data_loader, dist_sampler
