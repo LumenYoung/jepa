@@ -36,6 +36,8 @@ l4c_model = l4c.realtime.RealTimeL4CasADi(
 x_sym = cs.MX.sym("x", 2, 1)
 y_sym = l4c_model(x_sym)
 
+breakpoint()
+
 casadi_func = cs.Function(
     "model_rt_approx", [x_sym, l4c_model.get_sym_params()], [y_sym]
 )
