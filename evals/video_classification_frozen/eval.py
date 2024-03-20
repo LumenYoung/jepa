@@ -29,17 +29,17 @@ import torch.nn.functional as F
 
 from torch.nn.parallel import DistributedDataParallel
 
-import src.models.vision_transformer as vit
-from src.models.attentive_pooler import AttentiveClassifier
-from src.datasets.data_manager import (
+import jepa.models.vision_transformer as vit
+from jepa.models.attentive_pooler import AttentiveClassifier
+from jepa.datasets.data_manager import (
     init_data,
 )
-from src.utils.distributed import init_distributed, AllReduce
-from src.utils.schedulers import (
+from jepa.utils.distributed import init_distributed, AllReduce
+from jepa.utils.schedulers import (
     WarmupCosineSchedule,
     CosineWDSchedule,
 )
-from src.utils.logging import AverageMeter, CSVLogger
+from jepa.utils.logging import AverageMeter, CSVLogger
 
 from evals.video_classification_frozen.utils import (
     make_transforms,
@@ -47,13 +47,13 @@ from evals.video_classification_frozen.utils import (
     FrameAggregation,
 )
 
-import src.models.predictor as vit_pred
+import jepa.models.predictor as vit_pred
 
-from src.models.utils.multimask import PredictorMultiMaskWrapper
+from jepa.models.utils.multimask import PredictorMultiMaskWrapper
 
 from datetime import datetime
 
-TRAINING = False
+TRAINING = True
 
 now = datetime.now()
 
