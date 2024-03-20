@@ -14,25 +14,6 @@ logging.basicConfig(filename=f"logs/eval_{now.strftime('%m-%d-%H-%M')}.log")
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
-model_name = "vit_large"
-checkpoint_key = "target_encoder"
-clip_duration = None
-frames_per_clip = 16
-tubelet_size = 2
-uniform_power = True
-use_silu = False
-tight_silu = False
-use_sdpa = True
-patch_size = 16
-folder = "/export/home/yang/git/jepa/ckpts/test/vitl"
-checkpoint = "vitl16.pth.tar"  # name of pretrained model file inside folder"
-write_tag = "jepa"
-device = "cuda:0"
-
-pretrained_path = os.path.join(folder, checkpoint)
-
-
 def init_model(
     device,
     pretrained,
@@ -96,25 +77,52 @@ def load_pretrained(encoder, pretrained, checkpoint_key="target_encoder"):
     return encoder
 
 
-encoder = init_model(
-    crop_size=224,
-    device=device,
-    pretrained=pretrained_path,
-    model_name=model_name,
-    patch_size=patch_size,
-    tubelet_size=tubelet_size,
-    frames_per_clip=frames_per_clip,
-)
+def main():
+
+    model_name = "vit_large"
+    checkpoint_key = "target_encoder"
+    frames_per_clip = 1
+    tubelet_size = 1
+    uniform_power = True
+    use_silu = False
+    tight_silu = False
+    use_sdpa = True
+    patch_size = 16
+    folder = "/repo/deps/jepa/ckpts/test/vitl"
+    checkpoint = "vitl16.pth.tar"  # name of pretrained model file inside folder"
+    device = "cuda:0"
+
+    write_tag = "jepa"
+    clip_duration = None
+
+    pretrained_path = os.path.join(folder, checkpoint)
+
+    jepa_encoder = init_model(
+        crop_size=224,
+        device=device,
+        pretrained=pretrained_path,
+        model_name=model_name,
+        patch_size=patch_size,
+        tubelet_size=tubelet_size,
+        frames_per_clip=frames_per_clip,
+        use_sdpa=use_sdpa,
+        use_SiLU=use_silu,
+        tight_SiLU=tight_silu,
+        uniform_power=uniform_power,
+        checkpoint_key=checkpoint_key,
+    )
+
+    @torch.no_grad()
+    def output_shape(self):
+        print("output shape")
+        pass
+
+    breakpoint()
+
+    jepa_encoder.output_shape = MethodType(output_shape, jepa_encoder)
+
+    print("finished")
 
 
-@torch.no_grad()
-def output_shape(self):
-    print("output shape")
-    pass
-
-
-encoder.output_shape = MethodType(output_shape, encoder)
-
-breakpoint()
-
-print("finished")
+if __name__ == "__main__":
+    main()
