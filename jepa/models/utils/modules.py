@@ -8,6 +8,7 @@
 import torch
 import torch.nn as nn
 import math
+import torch.nn.functional as F
 
 
 # Efficient implementation equivalent to the following:
@@ -34,7 +35,6 @@ def scaled_dot_product_attention(
     attn_weight = torch.softmax(attn_weight, dim=-1)
     attn_weight = torch.dropout(attn_weight, dropout_p, train=True)
     return attn_weight @ value
-
 
 class MLP(nn.Module):
     def __init__(
